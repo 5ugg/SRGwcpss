@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.0/milligram.min.css">
+  <style>
+    body {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    /* ... (other CSS styles) ... */
+    #answer {
+      font-size: 16px;
+      width: 40%; /* Adjust the width as needed */
+      padding: 8px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Spanish Review Game</h1>
+  <div id="question"></div>
+  <input type="text" id="answer" placeholder="Enter the English translation" autocomplete="off" onkeypress="handleKeyPress(event)">
+  <div id="result"></div>
+  <div id="streak">Streak: 0 | Highest Streak: 0</div>
+  <div class="button-container">
+    <button class="button-primary" onclick="checkAnswer()">Submit</button>
+    <button class="button-clear" onclick="clearAnswer()">Clear Answer</button>
+  </div>
+  <div class="footer">
+    Designed and Made by Branson & Yuri
+  </div>
+
+  <script>
+    var words = [
+      ["Buenos días", "Good morning"],
+      ["Buenas tardes", "Good afternoon"],
+      ["Buenas noches", "Good evening"],
+      ["¿Cómo te llamas?", "What's your name?"],
+      ["¿Cómo estás?", "How are you?"],
+      ["bien", "well"],
+      ["muy bien", "very well"],
+      ["mal", "bad"],
+      ["muy mal", "very bad"],
+      ["más o menos", "so-so"],
+      ["cansado", "tired"],
+      ["triste", "sad"],
+      ["Tú", "You"],
+      ["Usted", "You (formal)"],
+      ["Como te llamas?", "What's your name?"],
+      ["Me llamo", "My name is"],
+      ["señor", "mister"],
+      ["señora", "Mrs."],
+      ["señorita", "Miss"],
+      ["adiós", "goodbye"],
+      ["hasta luego", "see you later"],
+      ["hasta pronto", "see you soon"],
+      ["hasta mañana", "see you tomorrow"],
+      ["nos vemos", "see you"],
+    ];
+
+    var currentIndex = -1;
+    var shuffledIndexes = [];
+    var currentStreak = 0;
+    var highestStreak = 0;
+
+    function loadWords() {
+      shuffledIndexes = shuffleArray(words.length);
+      displayQuestion();
+    }
+
+    function shuffleAndDisplayQuestion(data) {
+      words = JSON.parse(data);
+      shuffledIndexes = shuffleArray(words.length);
+      displayQuestion();
+    }
+
+    function displayQuestion() {
+      currentIndex++;
+      if (currentIndex >= words.length) {
+        currentIndex = 0; // Reset currentIndex to loop through questions again
+        shuffledIndexes = shuffleArray(words.length);
+      }
+      var randomIndex = shuffledIndexes[currentIndex];
+      document.getElementById("question").textContent = words[randomIndex][0];
+      document.getElementById("result").textContent = '';
+      document.getElementById("answer").value = ''; // Clear the input box
+    }
+
+    function checkAnswer() {
+      var userAnswer = document.getElementById("answer").value.toLowerCase();
+      var randomIndex = shuffledIndexes[currentIndex];
+      var correctAnswer = words[randomIndex][1].toLowerCase();
+      var resultMessage = document.getElementById("result"); // Get the result element
+      
+      if (userAnswer === correctAnswer) {
+        resultMessage.textContent = "Correct!";
+        currentStreak++;
+        if (currentStreak > highestStreak) {
+          highestStreak = currentStreak;
+        }
+      } else {
+        resultMessage.textContent = "Incorrect. The correct answer is: " + words[randomIndex][1];
+        currentStreak = 0;
+      }
+      
+      document.getElementById("streak").textContent = "Streak: " + currentStreak + " | Highest Streak: " + highestStreak;
+      setTimeout(displayQuestion, 1000); // Change to the next question after 1 second
+    }
+
+    function clearAnswer() {
+      document.getElementById("answer").value = '';
+      document.getElementById("result").textContent = '';
+    }
+
+    // Fisher-Yates shuffle algorithm to shuffle the indexes
+    function shuffleArray(arrayLength) {
+      var array = Array.from({ length: arrayLength }, (_, i) => i);
+      for (var i = arrayLength - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Function to handle Enter key press
+    function handleKeyPress(event) {
+      if (event.keyCode === 13) { // 13 is the key code for Enter
+        checkAnswer();
+      }
+    }
+
+    loadWords();
+  </script>
+</body>
+</html>
